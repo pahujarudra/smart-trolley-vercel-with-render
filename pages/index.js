@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Head from 'next/head';
 
-const BACKEND_URL = 'https://render-trolley.onrender.com';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export default function Home() {
   const [billId, setBillId] = useState('');
@@ -29,7 +29,7 @@ export default function Home() {
         setError('Bill not found');
       }
     } catch (err) {
-      setError('Error checking bill: ' + err.message);
+      setError('Error: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -42,172 +42,371 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Smart Cart System</title>
+        <title>Smart Cart</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#4F46E5" />
       </Head>
 
       <style jsx>{`
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          background: #F9FAFB;
           min-height: 100vh;
-          padding: 40px 20px;
         }
+
+        .navbar {
+          background: white;
+          padding: 16px 20px;
+          border-bottom: 1px solid #E5E7EB;
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
+        .nav-content {
+          max-width: 1200px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .logo {
+          font-size: 24px;
+          font-weight: 700;
+          color: #4F46E5;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .logo-icon {
+          width: 32px;
+          height: 32px;
+          background: #4F46E5;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 18px;
+        }
+
         .container {
           max-width: 600px;
           margin: 0 auto;
-          background: white;
-          border-radius: 20px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-          padding: 40px;
+          padding: 24px 20px;
         }
-        h1 {
+
+        .hero {
           text-align: center;
-          color: #2d3748;
-          margin-bottom: 10px;
+          padding: 40px 0;
+        }
+
+        .hero h1 {
           font-size: 32px;
+          font-weight: 700;
+          color: #111827;
+          margin-bottom: 12px;
+          line-height: 1.2;
         }
-        .subtitle {
-          text-align: center;
-          color: #718096;
-          margin-bottom: 40px;
+
+        .hero p {
+          font-size: 16px;
+          color: #6B7280;
+          line-height: 1.5;
         }
-        .section {
-          background: #f7f9fc;
-          border-radius: 12px;
-          padding: 30px;
-          margin-bottom: 20px;
+
+        .card {
+          background: white;
+          border-radius: 16px;
+          padding: 24px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          margin-bottom: 16px;
         }
-        .section h2 {
-          color: #2d3748;
-          margin-bottom: 20px;
-          font-size: 20px;
+
+        .card-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #111827;
+          margin-bottom: 16px;
         }
+
+        .input-group {
+          margin-bottom: 16px;
+        }
+
+        .input-label {
+          display: block;
+          font-size: 14px;
+          font-weight: 500;
+          color: #374151;
+          margin-bottom: 8px;
+        }
+
         input {
           width: 100%;
-          padding: 15px;
-          border: 2px solid #e0e6ed;
-          border-radius: 8px;
+          padding: 12px 16px;
+          border: 1px solid #D1D5DB;
+          border-radius: 10px;
           font-size: 16px;
-          margin-bottom: 15px;
-          transition: border-color 0.3s;
+          color: #111827;
+          background: white;
+          transition: all 0.2s;
         }
+
         input:focus {
           outline: none;
-          border-color: #667eea;
+          border-color: #4F46E5;
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
-        button {
+
+        input::placeholder {
+          color: #9CA3AF;
+        }
+
+        .btn {
           width: 100%;
-          padding: 15px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 14px 24px;
+          background: #4F46E5;
           color: white;
           border: none;
-          border-radius: 8px;
+          border-radius: 10px;
           font-size: 16px;
-          font-weight: 700;
+          font-weight: 600;
           cursor: pointer;
-          transition: transform 0.2s;
-          opacity: ${loading ? 0.6 : 1};
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
         }
-        button:hover { transform: translateY(-2px); }
-        button:active { transform: translateY(0); }
-        button:disabled { cursor: not-allowed; }
-        .error {
-          color: #e53e3e;
-          text-align: center;
-          margin-top: 15px;
-          padding: 10px;
-          background: #fed7d7;
-          border-radius: 8px;
+
+        .btn:hover {
+          background: #4338CA;
         }
-        .bill-result {
-          background: white;
-          border-radius: 8px;
-          padding: 20px;
-          margin-top: 20px;
+
+        .btn:active {
+          transform: scale(0.98);
         }
+
+        .btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .error-msg {
+          background: #FEF2F2;
+          color: #991B1B;
+          padding: 12px 16px;
+          border-radius: 10px;
+          margin-top: 16px;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .bill-card {
+          margin-top: 24px;
+          padding: 0;
+          overflow: hidden;
+        }
+
         .bill-header {
-          color: #667eea;
-          font-size: 20px;
+          background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+          color: white;
+          padding: 20px 24px;
+        }
+
+        .bill-id {
+          font-size: 24px;
           font-weight: 700;
-          margin-bottom: 15px;
+          margin-bottom: 4px;
         }
-        .bill-info {
-          margin-bottom: 15px;
-          line-height: 1.8;
+
+        .bill-date {
+          font-size: 14px;
+          opacity: 0.9;
         }
-        .bill-items {
-          background: #f7f9fc;
-          padding: 15px;
-          border-radius: 8px;
-          margin-bottom: 15px;
+
+        .bill-body {
+          padding: 24px;
         }
-        .bill-item {
+
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          background: #D1FAE5;
+          color: #065F46;
+          border-radius: 20px;
+          font-size: 13px;
+          font-weight: 600;
+          margin-bottom: 20px;
+        }
+
+        .items-list {
+          border: 1px solid #E5E7EB;
+          border-radius: 12px;
+          overflow: hidden;
+        }
+
+        .item-row {
           display: flex;
           justify-content: space-between;
-          padding: 10px 0;
-          border-bottom: 1px solid #e0e6ed;
+          align-items: center;
+          padding: 16px;
+          border-bottom: 1px solid #E5E7EB;
         }
-        .bill-item:last-child { border-bottom: none; }
-        .bill-total {
-          text-align: right;
-          font-size: 20px;
-          font-weight: 700;
-          color: #667eea;
-          padding-top: 10px;
+
+        .item-row:last-child {
+          border-bottom: none;
         }
-        .status-badge {
-          display: inline-block;
-          padding: 4px 12px;
-          background: #c6f6d5;
-          color: #22543d;
-          border-radius: 12px;
-          font-size: 14px;
+
+        .item-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .item-name {
+          font-size: 15px;
           font-weight: 600;
+          color: #111827;
+        }
+
+        .item-qty {
+          font-size: 13px;
+          color: #6B7280;
+        }
+
+        .item-price {
+          font-size: 15px;
+          font-weight: 600;
+          color: #4F46E5;
+        }
+
+        .total-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px;
+          background: #F9FAFB;
+          margin-top: 16px;
+          border-radius: 12px;
+        }
+
+        .total-label {
+          font-size: 16px;
+          font-weight: 600;
+          color: #374151;
+        }
+
+        .total-amount {
+          font-size: 24px;
+          font-weight: 700;
+          color: #111827;
+        }
+
+        .spinner {
+          width: 20px;
+          height: 20px;
+          border: 2px solid rgba(255,255,255,0.3);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+          .hero h1 { font-size: 28px; }
+          .container { padding: 20px 16px; }
+          .card { padding: 20px; }
         }
       `}</style>
 
+      <div className="navbar">
+        <div className="nav-content">
+          <div className="logo">
+            <div className="logo-icon">🛒</div>
+            <span>Smart Cart</span>
+          </div>
+        </div>
+      </div>
+
       <div className="container">
-        <h1>🛒 Smart Cart</h1>
-        <p className="subtitle">Scan, Shop, Pay - Seamlessly</p>
-        
-        <div className="section">
-          <h2>📋 Check Previous Bills</h2>
-          <input
-            type="text"
-            placeholder="Enter Bill ID (e.g., A100)"
-            value={billId}
-            onChange={(e) => setBillId(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-          <button onClick={checkBill} disabled={loading}>
-            {loading ? 'Checking...' : 'Check Bill'}
+        <div className="hero">
+          <h1>Welcome Back</h1>
+          <p>View your purchase history and receipts</p>
+        </div>
+
+        <div className="card">
+          <div className="card-title">Check Your Bill</div>
+          <div className="input-group">
+            <label className="input-label">Bill ID</label>
+            <input
+              type="text"
+              placeholder="e.g., A100"
+              value={billId}
+              onChange={(e) => setBillId(e.target.value.toUpperCase())}
+              onKeyPress={handleKeyPress}
+            />
+          </div>
+          <button className="btn" onClick={checkBill} disabled={loading}>
+            {loading ? <div className="spinner" /> : '🔍'}
+            {loading ? 'Searching...' : 'Search Bill'}
           </button>
-          
-          {error && <div className="error">{error}</div>}
-          
-          {bill && (
-            <div className="bill-result">
-              <div className="bill-header">Bill Details</div>
-              <div className="bill-info">
-                <strong>Bill ID:</strong> {bill.billId}<br/>
-                <strong>Date:</strong> {new Date(bill.timestamp).toLocaleString()}<br/>
-                <strong>Status:</strong> <span className="status-badge">✓ Paid</span>
-              </div>
-              <div className="bill-items">
-                <strong style={{marginBottom: '10px', display: 'block'}}>Items:</strong>
-                {bill.items.map((item, idx) => (
-                  <div key={idx} className="bill-item">
-                    <span>{item.name} ×{item.quantity}</span>
-                    <span>₹{item.price * item.quantity}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="bill-total">Total: ₹{bill.total}</div>
+
+          {error && (
+            <div className="error-msg">
+              ⚠️ {error}
             </div>
           )}
         </div>
+
+        {bill && (
+          <div className="card bill-card">
+            <div className="bill-header">
+              <div className="bill-id">Bill #{bill.billId}</div>
+              <div className="bill-date">
+                {new Date(bill.timestamp).toLocaleDateString('en-IN', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+            </div>
+            <div className="bill-body">
+              <div className="status-badge">
+                ✓ Payment Confirmed
+              </div>
+              <div className="items-list">
+                {bill.items.map((item, idx) => (
+                  <div key={idx} className="item-row">
+                    <div className="item-info">
+                      <div className="item-name">{item.name}</div>
+                      <div className="item-qty">Quantity: {item.quantity}</div>
+                    </div>
+                    <div className="item-price">₹{item.price * item.quantity}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="total-row">
+                <div className="total-label">Total Paid</div>
+                <div className="total-amount">₹{bill.total}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
